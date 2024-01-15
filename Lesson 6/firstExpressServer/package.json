@@ -1,0 +1,23 @@
+{
+  "name": "firstexpressserver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "forever": "^4.0.3",
+    "jsonwebtoken": "^9.0.2",
+    "local-storage": "^2.0.0",
+    "mysql": "^2.17.1",
+    "validator": "^13.11.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
