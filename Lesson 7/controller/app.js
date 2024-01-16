@@ -6,6 +6,8 @@ var cors = require('cors');
 var validator = require('validator');
 var validateFn=require('../validation/validationFns');
 var bcrypt=require('bcryptjs');
+var verifyToken = require("../auth/verifyToken.js");
+
 
 
 app.options('*', cors());
@@ -16,7 +18,7 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 app.use(bodyParser.json());
 app.use(urlencodedParser);
 
-app.get('/user/:userid', validateFn.validateUserid,function (req, res) {
+app.get('/user/:userid',verifyToken.verifyAdmin, validateFn.validateUserid,function (req, res) {
     var id = req.params.userid;
 
     user.getUser(id, function (err, result) {
@@ -30,7 +32,7 @@ app.get('/user/:userid', validateFn.validateUserid,function (req, res) {
     });
 });
 
-app.get('/user', function (req, res) {
+app.get('/user',verifyToken.verifyAdmin, function (req, res) {
 
     user.getUsers(function (err, result) {
        
@@ -45,13 +47,48 @@ app.get('/user', function (req, res) {
 
 
 //POST (INSERT) /user
-app.post('/user', validateFn.validateRegister, function (req, res) {
+app.post('/user',verifyToken.verifyAdmin ,validateFn.validateRegister, function (req, res) {
     var username = req.body.username;
     var email = req.body.email;
     var password = req.body.password;
     var role = "member";//req.body.role;
 
-    user.insertUser(username, email, role, password, function (err, result) {
+    const saltRounds = 10; //Set amount of salt rounds to 10
+
+    /*user.insertUser(username, email, role, password, function (err, result) {
+
+        res.type('json');
+        if (err) {
+            res.status(500);
+            res.send(`{"message":"Internal Server Error"}`);
+
+        } else {
+            res.status(200);
+            res.send(`{"Record Inserted":"${result.affectedRows}"}`);
+        }
+    });*/
+
+    bcrypt.hash(username, saltRounds, function (err, hashedUsername)
+    {
+        if (err)
+        {
+            res.status(500);
+            res.send(`{"message":"Internal Server Error"}`);
+            return;
+        }
+    })
+
+    bcrypt.hash(password, saltRounds, function (err, hashedPassword)
+    {
+        if (err)
+        {
+            res.status(500);
+            res.send(`{"message":"Internal Server Error"}`);
+            return;
+        }
+    })
+
+    user.insertUser(hashedUsername, email, role, hashedPassword, function (err, result) {
 
         res.type('json');
         if (err) {
@@ -67,7 +104,7 @@ app.post('/user', validateFn.validateRegister, function (req, res) {
 });
 
 
-app.delete('/user/:userid',validateFn.validateUserid, function (req, res) {
+app.delete('/user/:userid', verifyToken.verifyAdmin, validateFn.validateUserid, function (req, res) {
 
     var userid = req.params.userid;
 

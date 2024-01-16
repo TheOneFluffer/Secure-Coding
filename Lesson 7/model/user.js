@@ -1,5 +1,6 @@
 var db = require('./databaseConfig.js');
 var config = require('../config.js');
+var jwt = require('jsonwebtoken');
 
 var userDB = {
     getUser: function (userid, callback) {
